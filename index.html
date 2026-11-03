@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penembak Belon Kata Nama Am (Aras 4)</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Inter & Orbitron for Arcade aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google MediaPipe Libraries CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+    <style>
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0d0914;
+            color: #ffffff;
+            overflow: hidden;
+        }
+        .font-arcade {
+            font-family: 'Orbitron', cursive, sans-serif;
+        }
+        .neon-text-cyan {
+            text-shadow: 0 0 10px rgba(6, 182, 212, 0.8), 0 0 20px rgba(6, 182, 212, 0.5);
+        }
+        .neon-text-pink {
+            text-shadow: 0 0 10px rgba(236, 72, 153, 0.8), 0 0 20px rgba(236, 72, 153, 0.5);
+        }
+        .neon-text-yellow {
+            text-shadow: 0 0 10px rgba(234, 179, 8, 0.8), 0 0 20px rgba(234, 179, 8, 0.5);
+        }
+        .neon-border {
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4), inset 0 0 15px rgba(168, 85, 247, 0.2);
+            border: 2px solid rgba(168, 85, 247, 0.6);
+        }
+        .neon-button {
+            transition: all 0.2s ease;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+        }
+        .neon-button:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.8);
+        }
+        /* Custom scrollbar for analysis table */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1b2e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a855f7;
+            border-radius: 4px;
+        }
+        /* Animation pulse for pinch demo */
+        @keyframes pinchPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.85); }
+        }
+        .animate-pinch {
+            animation: pinchPulse 1.5s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="w-screen h-screen flex flex-col justify-between relative bg-slate-950 text-white">
+
+    <!-- WebCam Hidden Element for Frame Capture -->
+    <video id="webcam-video" class="hidden" playsinline></video>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 1: MENU UTAMA (START MENU) -->
+    <!-- ========================================== -->
+    <div id="screen-menu" class="absolute inset-0 z-50 flex flex-col items-center justify-between p-4 md:p-8 bg-gradient-to-b from-slate-950 via-purple-950 to-slate-950 overflow-y-auto">
+        <!-- Top Title Header -->
+        <div class="text-center mt-4">
+            <span class="inline-block px-4 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/40 text-cyan-400 font-semibold text-xs md:text-sm tracking-wider uppercase mb-2">
+                <i class="fa-solid font-bold fa-gamepad mr-2"></i> Bahagian Tatabahasa Bahasa Melayu
+            </span>
+            <h1 class="text-3xl md:text-5xl lg:text-6xl font-black font-arcade text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-pink-500 to-yellow-400 neon-text-cyan leading-tight">
+                PENEMBAK BELON
+            </h1>
+            <p class="text-xl md:text-2xl font-bold text-purple-300 mt-1 neon-text-pink">
+                Kata Nama Am (Aras 4)
+            </p>
+        </div>
+
+        <!-- Gesture & Interactive Instructions Cards -->
+        <div class="w-full max-w-4xl my-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Gesture 1: Pinch -->
+            <div class="bg-slate-900/80 border border-cyan-500/40 rounded-2xl p-5 text-center flex flex-col items-center justify-center backdrop-blur-md">
+                <div class="w-16 h-16 rounded-full bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-400 text-2xl mb-3 animate-pinch">
+                    <i class="fa-solid fa-hand-back-fist rotate-90"></i>
+                </div>
+                <h3 class="font-arcade font-bold text-cyan-400 text-lg">1. ISYARAT PINCH</h3>
+                <p class="text-xs md:text-sm text-slate-300 mt-2">
+                    Rapatkan <span class="text-cyan-300 font-bold">Hujung Ibu Jari</span> &amp; <span class="text-cyan-300 font-bold">Jari Telunjuk</span> (Landmark 4 &amp; 8) untuk meletupkan belon secara serta-merta.
+                </p>
+            </div>
+
+            <!-- Gesture 2: Fist / Genggam -->
+            <div class="bg-slate-900/80 border border-pink-500/40 rounded-2xl p-5 text-center flex flex-col items-center justify-center backdrop-blur-md">
+                <div class="w-16 h-16 rounded-full bg-pink-500/20 border border-pink-400 flex items-center justify-center text-pink-400 text-2xl mb-3">
+                    <i class="fa-solid fa-hand-fist"></i>
+                </div>
+                <h3 class="font-arcade font-bold text-pink-400 text-lg">2. GENGGAM TANGAN</h3>
+                <p class="text-xs md:text-sm text-slate-300 mt-2">
+                    Genggam kesemua jari tangan anda di atas sasaran belon untuk tembakan isyarat alt.
+                </p>
+            </div>
+
+            <!-- Feature 3: Hover-Dwell & Touch -->
+            <div class="bg-slate-900/80 border border-yellow-500/40 rounded-2xl p-5 text-center flex flex-col items-center justify-center backdrop-blur-md">
+                <div class="w-16 h-16 rounded-full bg-yellow-500/20 border border-yellow-400 flex items-center justify-center text-yellow-400 text-2xl mb-3">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </div>
+                <h3 class="font-arcade font-bold text-yellow-400 text-lg">3. HOVER / TETIKUS</h3>
+                <p class="text-xs md:text-sm text-slate-300 mt-2">
+                    Tahan sasaran pada belon selama <span class="text-yellow-300 font-bold">0.6s (Dwell)</span> ATAU guna klip tetikus / sentuhan skrin.
+                </p>
+            </div>
+        </div>
+
+        <!-- Mode Selector & Controls -->
+        <div class="w-full max-w-md bg-slate-900/90 border border-purple-500/40 rounded-2xl p-4 text-center backdrop-blur-md mb-4">
+            <label class="block text-purple-300 font-semibold text-xs md:text-sm mb-3">PILIH MOD KAWALAN PERMAINAN:</label>
+            <div class="grid grid-cols-2 gap-3">
+                <button id="btn-mode-webcam" onclick="setControlMode('webcam')" class="py-2.5 px-4 rounded-xl border font-bold text-xs md:text-sm flex items-center justify-center space-x-2 bg-cyan-600 border-cyan-400 text-white shadow-lg transition-all">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Webcam (AI Hands)</span>
+                </button>
+                <button id="btn-mode-mouse" onclick="setControlMode('mouse')" class="py-2.5 px-4 rounded-xl border font-bold text-xs md:text-sm flex items-center justify-center space-x-2 bg-slate-800 border-slate-700 text-slate-400 hover:text-white transition-all">
+                    <i class="fa-solid fa-mouse-pointer"></i>
+                    <span>Tetikus / Sentuh</span>
+                </button>
+            </div>
+            <div id="camera-status" class="mt-3 text-xs text-cyan-300 font-medium flex items-center justify-center">
+                <i class="fa-solid fa-circle-info mr-1.5"></i> Kebenaran webcam akan diminta apabila permainan bermula.
+            </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="mb-6">
+            <button onclick="startGame()" class="neon-button py-4 px-12 rounded-full bg-gradient-to-r from-cyan-500 via-purple-600 to-pink-500 font-arcade font-black text-xl md:text-2xl text-white tracking-widest border-2 border-cyan-300 uppercase shadow-2xl flex items-center space-x-3">
+                <span>MULA MAIN</span>
+                <i class="fa-solid fa-play text-yellow-300"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 2: GAMEPLAY UTAMA (60FPS CANVAS) -->
+    <!-- ========================================== -->
+    <div id="screen-game" class="absolute inset-0 z-10 flex flex-col justify-between hidden">
+        <!-- Top Status Dashboard Bar -->
+        <div class="w-full bg-slate-950/90 border-b border-purple-500/30 p-3 md:p-4 backdrop-blur-md flex flex-col md:flex-row items-center justify-between z-20 gap-2">
+            <!-- Left: Score & Combo -->
+            <div class="flex items-center space-x-4">
+                <div class="bg-slate-900 border border-cyan-500/50 rounded-xl px-4 py-1.5 flex items-center space-x-3">
+                    <i class="fa-solid fa-trophy text-yellow-400 text-lg"></i>
+                    <div>
+                        <div class="text-[10px] text-cyan-400 uppercase font-bold tracking-wider">SKOR</div>
+                        <div id="ui-score" class="font-arcade font-bold text-lg md:text-xl text-yellow-300">0</div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-pink-500/50 rounded-xl px-4 py-1.5 flex items-center space-x-2">
+                    <i class="fa-solid fa-bolt text-pink-400 text-lg"></i>
+                    <div>
+                        <div class="text-[10px] text-pink-400 uppercase font-bold tracking-wider">KOMBO</div>
+                        <div id="ui-combo" class="font-arcade font-bold text-lg md:text-xl text-pink-300">x1</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center: Active Question Card -->
+            <div class="flex-1 w-full md:max-w-xl mx-2 bg-gradient-to-r from-purple-950/80 via-slate-900/90 to-purple-950/80 border border-cyan-400/60 rounded-xl p-2.5 text-center shadow-lg backdrop-blur-md">
+                <div class="flex items-center justify-between mb-1 text-[11px] font-bold text-cyan-300">
+                    <span id="ui-q-num">SOALAN 1 / 15</span>
+                    <span class="bg-purple-900/80 px-2.5 py-0.5 rounded-full text-pink-300 border border-pink-500/30">Aras 4: Kata Nama Am</span>
+                </div>
+                <div id="ui-question" class="text-sm md:text-base lg:text-lg font-bold text-white tracking-wide">
+                    Mengumpul soalan kuiz...
+                </div>
+            </div>
+
+            <!-- Right: Timer & Sound Controls -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-slate-900 border border-yellow-500/50 rounded-xl px-4 py-1.5 flex items-center space-x-3">
+                    <i class="fa-solid fa-stopwatch text-yellow-400 text-xl animate-pulse"></i>
+                    <div>
+                        <div class="text-[10px] text-yellow-400 uppercase font-bold tracking-wider">MASA</div>
+                        <div id="ui-timer" class="font-arcade font-bold text-lg md:text-xl text-yellow-300">60s</div>
+                    </div>
+                </div>
+
+                <button onclick="toggleAudio()" id="btn-audio" class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 text-cyan-400 flex items-center justify-center hover:border-cyan-400 transition-all">
+                    <i class="fa-solid fa-volume-high text-base"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Interactive Game Canvas -->
+        <div class="relative flex-1 w-full h-full bg-slate-950 overflow-hidden">
+            <canvas id="game-canvas" class="w-full h-full block cursor-crosshair"></canvas>
+
+            <!-- Gesture / Target Status Badge Overlay -->
+            <div id="gesture-badge" class="absolute bottom-4 left-4 bg-slate-900/90 border border-cyan-400/40 rounded-xl px-4 py-2 flex items-center space-x-3 backdrop-blur-md z-20 pointer-events-none">
+                <div id="gesture-indicator-dot" class="w-3.5 h-3.5 rounded-full bg-slate-500"></div>
+                <span id="gesture-text" class="text-xs font-bold text-cyan-300 uppercase tracking-wider font-arcade">PENEMBAK SIAP</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SCREEN 3: RESULTS & GRAMMAR ANALYSIS -->
+    <!-- ========================================== -->
+    <div id="screen-results" class="absolute inset-0 z-50 flex flex-col items-center justify-between p-4 md:p-8 bg-gradient-to-b from-slate-950 via-purple-950 to-slate-950 overflow-y-auto hidden">
+        <!-- Header -->
+        <div class="text-center mt-2">
+            <h2 class="text-3xl md:text-5xl font-black font-arcade text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-pink-500 to-cyan-400 neon-text-yellow">
+                KEPUTUSAN KUIZ
+            </h2>
+            <p class="text-sm md:text-base text-purple-300 font-semibold mt-1">Analisis Tatabahasa Kata Nama Am Aras 4</p>
+        </div>
+
+        <!-- Score & Grade Metrics Summary -->
+        <div class="w-full max-w-4xl grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 my-4">
+            <div class="bg-slate-900/90 border border-yellow-500/40 rounded-2xl p-4 text-center backdrop-blur-md">
+                <div class="text-xs text-yellow-400 font-bold uppercase tracking-wider mb-1">JUMLAH SKOR</div>
+                <div id="res-score" class="font-arcade font-black text-2xl md:text-4xl text-yellow-300">0</div>
+            </div>
+            <div class="bg-slate-900/90 border border-cyan-500/40 rounded-2xl p-4 text-center backdrop-blur-md">
+                <div class="text-xs text-cyan-400 font-bold uppercase tracking-wider mb-1">KETEPATAN</div>
+                <div id="res-accuracy" class="font-arcade font-black text-2xl md:text-4xl text-cyan-300">0%</div>
+            </div>
+            <div class="bg-slate-900/90 border border-pink-500/40 rounded-2xl p-4 text-center backdrop-blur-md">
+                <div class="text-xs text-pink-400 font-bold uppercase tracking-wider mb-1">KOMBO MAX</div>
+                <div id="res-combo" class="font-arcade font-black text-2xl md:text-4xl text-pink-300">x1</div>
+            </div>
+            <div class="bg-slate-900/90 border border-purple-500/40 rounded-2xl p-4 text-center backdrop-blur-md">
+                <div class="text-xs text-purple-400 font-bold uppercase tracking-wider mb-1">GRED PENCAPAIAN</div>
+                <div id="res-grade" class="font-arcade font-black text-2xl md:text-4xl text-purple-300">A+</div>
+            </div>
+        </div>
+
+        <!-- Detailed Grammar Analysis Table -->
+        <div class="w-full max-w-4xl bg-slate-900/90 border border-purple-500/40 rounded-2xl p-4 md:p-6 backdrop-blur-md flex-1 my-2 overflow-hidden flex flex-col">
+            <h3 class="font-arcade font-bold text-cyan-400 text-sm md:text-base mb-3 flex items-center">
+                <i class="fa-solid fa-list-check mr-2 text-pink-400"></i> SENARAI ULASEAN &amp; ANALISIS JAWAPAN:
+            </h3>
+            <div class="overflow-y-auto flex-1 pr-2 space-y-3" id="analysis-list">
+                <!-- Injected via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Replay & Menu Action Buttons -->
+        <div class="flex items-center space-x-4 my-4">
+            <button onclick="startGame()" class="neon-button py-3 px-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 font-arcade font-bold text-base md:text-lg text-white border border-cyan-300 shadow-xl flex items-center space-x-2">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>MAIN SEMULA</span>
+            </button>
+            <button onclick="showMenu()" class="py-3 px-8 rounded-full bg-slate-800 hover:bg-slate-700 border border-slate-600 font-arcade font-bold text-base md:text-lg text-slate-200 transition-all flex items-center space-x-2">
+                <i class="fa-solid fa-house"></i>
+                <span>MENU UTAMA</span>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT LOGIC & GAME ENGINE -->
+    <!-- ========================================== -->
+    <script>
+        /* -------------------------------------------------- */
+        /* 1. BANK SOALAN KATA NAMA AM (ARAS 4 BAHASA MELAYU) */
+        /* -------------------------------------------------- */
+        const QUESTION_BANK = [
+            {
+                id: 1,
+                question: "Pilih Kata Nama Am ABSTRAK yang merujuk kepada konsep/sifat:",
+                options: ["Kejayaan", "Bangunan", "Pembalur", "Komputer"],
+                answer: "Kejayaan",
+                explanation: "'Kejayaan' ialah kata nama am abstrak berimbuhan (ke-...-an) yang merujuk kepada konsep dan tidak dapat disentuh."
+            },
+            {
+                id: 2,
+                question: "Manakah antara berikut merupakan Kata Nama Am Konkrit Tak Hidup?",
+                options: ["Pembaris", "Harimau", "Jurutera", "Pokok"],
+                answer: "Pembaris",
+                explanation: "'Pembaris' ialah kata nama am konkrit (berwujud fizikal) dan bukan benda hidup."
+            },
+            {
+                id: 3,
+                question: "Perkataan 'keindahan' tergolong dalam jenis kata nama am...",
+                options: ["Abstrak", "Konkrit Hidup", "Konkrit Bukan Hidup", "Kata Khas"],
+                answer: "Abstrak",
+                explanation: "'Keindahan' merujuk kepada sifat atau keadaan nilai estetik yang terwujud dalam fikiran (abstrak)."
+            },
+            {
+                id: 4,
+                question: "Pilih Kata Nama Am Hidup Bukan Manusia:",
+                options: ["Gajah", "Doktor", "Perpustakaan", "Angin"],
+                answer: "Gajah",
+                explanation: "'Gajah' merupakan kata nama am yang merujuk kepada makhluk hidup bernyawa (haiwan/bukan manusia)."
+            },
+            {
+                id: 5,
+                question: "Ayat manakah mengandungi Kata Nama Am Abstrak?",
+                options: [
+                    "Cita-cita Ali amat tinggi.",
+                    "Ali membeli meja kayu baharu.",
+                    "Kucing comel itu tidur di atas sofa.",
+                    "Bas sekolah itu berwarna kuning."
+                ],
+                answer: "Cita-cita Ali amat tinggi.",
+                explanation: "'Cita-cita' ialah kata nama am abstrak yang menyatakan angan-angan atau impian seseorang."
+            },
+            {
+                id: 6,
+                question: "Pilih kata nama am berbentuk Kata Ganda yang merujuk kepada objek konkrit:",
+                options: ["Layang-layang", "Kanak-kanak", "Kedamaian", "Keberanian"],
+                answer: "Layang-layang",
+                explanation: "'Layang-layang' ialah kata nama am konkrit (benda) yang terbentuk menerusi proses penggandaan."
+            },
+            {
+                id: 7,
+                question: "Perkataan 'perpustakaan' ialah kata nama am konkrit yang merujuk kepada...",
+                options: ["Tempat", "Manusia", "Haiwan", "Tumbuhan"],
+                answer: "Tempat",
+                explanation: "'Perpustakaan' merujuk kepada bangunan atau tempat khusus bagi menyimpan koleksi bahan bacaan."
+            },
+            {
+                id: 8,
+                question: "Manakah antara berikut BUKAN kata nama am abstrak?",
+                options: ["Pensel", "Kedamaian", "Impian", "Keberanian"],
+                answer: "Pensel",
+                explanation: "'Pensel' mempunyai bentuk fizikal nyata yang boleh dipegang, menjadikannya kata nama am konkrit."
+            },
+            {
+                id: 9,
+                question: "Perkataan 'pendidikan' dibentuk daripada kata dasar 'didik'. Ia merupakan kata nama am...",
+                options: ["Abstrak", "Konkrit Hidup", "Khas Manusia", "Konkrit Benda"],
+                answer: "Abstrak",
+                explanation: "'Pendidikan' merujuk kepada perihal/proses mendidik dan tergolong sebagai kata nama am abstrak."
+            },
+            {
+                id: 10,
+                question: "Manakah antara berikut ialah Kata Nama Am Hidup Manusia?",
+                options: ["Nelayan", "Sampan", "Lautan", "Ikan"],
+                answer: "Nelayan",
+                explanation: "'Nelayan' merujuk kepada kelompok manusia yang menjalankan pekerjaan di laut."
+            },
+            {
+                id: 11,
+                question: "Pilih pasangan (Kata Nama Am Konkrit & Kata Nama Am Abstrak) yang betul:",
+                options: [
+                    "Buku & Ilmu",
+                    "Kereta & Meja",
+                    "Kucing & Harimau",
+                    "Kasih & Cinta"
+                ],
+                answer: "Buku & Ilmu",
+                explanation: "'Buku' boleh dipegang secara fizikal (konkrit) manakala 'Ilmu' ialah pengolahan minda/konsep (abstrak)."
+            },
+            {
+                id: 12,
+                question: "Apakah jenis kata nama am bagi perkataan 'keharmonisan'?",
+                options: ["Kata Nama Am Abstrak", "Kata Nama Am Konkrit", "Kata Khas", "Kata Ganti Nama"],
+                answer: "Kata Nama Am Abstrak",
+                explanation: "'Keharmonisan' merujuk kepada suasana/keadaan ketenteraman dan kedamaian (abstrak)."
+            },
+            {
+                id: 13,
+                question: "Manakah Kata Nama Am Konkrit Tak Hidup Unsur Alam semulajadi?",
+                options: ["Gunung", "Burung", "Petani", "Kesihatan"],
+                answer: "Gunung",
+                explanation: "'Gunung' ialah kata nama am konkrit bukan hidup yang tergolong dalam bentuk muka bumi / alam."
+            },
+            {
+                id: 14,
+                question: "Perkataan 'kesihatan' dalam 'Kesihatan amat penting' ialah kata nama am...",
+                options: ["Abstrak", "Konkrit", "Khas", "Kata Kerja"],
+                answer: "Abstrak",
+                explanation: "'Kesihatan' merujuk kepada perihal sihat dan tidak boleh disentuh secara fizikal."
+            },
+            {
+                id: 15,
+                question: "Pilih ayat yang mempunyai Kata Nama Am Hidup Bukan Manusia (Tumbuhan):",
+                options: [
+                    "Pokok getah itu menghasilkan susu.",
+                    "Adik membaca buku cerita.",
+                    "Bapa memandu kereta ke pejabat.",
+                    "Keberanian pahlawan itu dipuji."
+                ],
+                answer: "Pokok getah itu menghasilkan susu.",
+                explanation: "'Pokok getah' (Pokok) ialah kata nama am bernyawa bagi spesies tumbuhan (bukan manusia)."
+            }
+        ];
+
+        /* -------------------------------------------------- */
+        /* 2. AUDIO SYNTHESIZER (WEB AUDIO API)               */
+        /* -------------------------------------------------- */
+        class SoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+                this.bgmTimer = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playPop() {
+                if (this.muted) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.08);
+
+                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.08);
+            }
+
+            playCorrect() {
+                if (this.muted) return;
+                this.init();
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.06);
+
+                    gain.gain.setValueAtTime(0.3, this.ctx.currentTime + idx * 0.06);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.06 + 0.2);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.start(this.ctx.currentTime + idx * 0.06);
+                    osc.stop(this.ctx.currentTime + idx * 0.06 + 0.2);
+                });
+            }
+
+            playWrong() {
+                if (this.muted) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(110, this.ctx.currentTime + 0.25);
+
+                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.25);
+            }
+
+            playCombo() {
+                if (this.muted) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1760, this.ctx.currentTime + 0.15);
+
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.15);
+            }
+
+            startBgm() {
+                if (this.bgmTimer) clearInterval(this.bgmTimer);
+                let step = 0;
+                const notes = [130.81, 146.83, 164.81, 174.61]; // Low synth pulse bass
+                this.bgmTimer = setInterval(() => {
+                    if (this.muted || !gameRunning) return;
+                    this.init();
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(notes[step % notes.length], this.ctx.currentTime);
+
+                    gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.18);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.18);
+                    step++;
+                }, 300);
+            }
+
+            stopBgm() {
+                if (this.bgmTimer) {
+                    clearInterval(this.bgmTimer);
+                    this.bgmTimer = null;
+                }
+            }
+        }
+
+        const audioManager = new SoundEngine();
+
+        function toggleAudio() {
+            audioManager.muted = !audioManager.muted;
+            const btn = document.getElementById('btn-audio');
+            if (audioManager.muted) {
+                btn.innerHTML = `<i class="fa-solid fa-volume-xmark text-red-400"></i>`;
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-volume-high text-cyan-400"></i>`;
+                audioManager.init();
+            }
+        }
+
+        /* -------------------------------------------------- */
+        /* 3. GAME STATE & VARIABLES                          */
+        /* -------------------------------------------------- */
+        let controlMode = 'webcam'; // 'webcam' or 'mouse'
+        let gameRunning = false;
+        let score = 0;
+        let combo = 1;
+        let maxCombo = 1;
+        let timeLeft = 60;
+        let timerInterval = null;
+        let currentQuestionIndex = 0;
+        let questionsList = [];
+        let userLogs = []; // Stores answers for results analysis
+
+        // Reticle / Cursor position (in Canvas Space)
+        let reticle = { x: 0, y: 0, active: false, dwellTime: 0, radius: 24 };
+        let isPinching = false;
+        let isFisting = false;
+        let lastTriggerTime = 0;
+
+        // MediaPipe Hands Instance & Camera Utils
+        let handsInstance = null;
+        let cameraInstance = null;
+        let handLandmarksData = null;
+
+        // Visual Entities
+        let balloons = [];
+        let particles = [];
+        let floatingTexts = [];
+
+        // Canvas Context
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const webcamVideo = document.getElementById('webcam-video');
+
+        /* -------------------------------------------------- */
+        /* 4. CANVAS RESIZE & INIT LOGIC                      */
+        /* -------------------------------------------------- */
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            if (reticle.x === 0 && reticle.y === 0) {
+                reticle.x = canvas.width / 2;
+                reticle.y = canvas.height / 2;
+            }
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function setControlMode(mode) {
+            controlMode = mode;
+            const btnCam = document.getElementById('btn-mode-webcam');
+            const btnMouse = document.getElementById('btn-mode-mouse');
+            const camStatus = document.getElementById('camera-status');
+
+            if (mode === 'webcam') {
+                btnCam.className = "py-2.5 px-4 rounded-xl border font-bold text-xs md:text-sm flex items-center justify-center space-x-2 bg-cyan-600 border-cyan-400 text-white shadow-lg transition-all";
+                btnMouse.className = "py-2.5 px-4 rounded-xl border font-bold text-xs md:text-sm flex items-center justify-center space-x-2 bg-slate-800 border-slate-700 text-slate-400 hover:text-white transition-all";
+                camStatus.style.display = 'flex';
+            } else {
+                btnMouse.className = "py-2.5 px-4 rounded-xl border font-bold text-xs md:text-sm flex items-center justify-center space-x-2 bg-cyan-600 border-cyan-400 text-white shadow-lg transition-all";
+                btnCam.className = "py-2.5 px-4 rounded-xl border font-bold text-xs md:text-sm flex items-center justify-center space-x-2 bg-slate-800 border-slate-700 text-slate-400 hover:text-white transition-all";
+                camStatus.style.display = 'none';
+            }
+        }
+
+        /* Mouse & Touch Controls Fallback */
+        window.addEventListener('mousemove', (e) => {
+            if (controlMode === 'mouse') {
+                const rect = canvas.getBoundingClientRect();
+                reticle.x = e.clientX - rect.left;
+                reticle.y = e.clientY - rect.top;
+                reticle.active = true;
+            }
+        });
+
+        window.addEventListener('mousedown', (e) => {
+            if (controlMode === 'mouse' && gameRunning) {
+                const rect = canvas.getBoundingClientRect();
+                reticle.x = e.clientX - rect.left;
+                reticle.y = e.clientY - rect.top;
+                triggerShoot();
+            }
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (controlMode === 'mouse' && e.touches.length > 0) {
+                const rect = canvas.getBoundingClientRect();
+                reticle.x = e.touches[0].clientX - rect.left;
+                reticle.y = e.touches[0].clientY - rect.top;
+                reticle.active = true;
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchstart', (e) => {
+            if (controlMode === 'mouse' && gameRunning && e.touches.length > 0) {
+                const rect = canvas.getBoundingClientRect();
+                reticle.x = e.touches[0].clientX - rect.left;
+                reticle.y = e.touches[0].clientY - rect.top;
+                triggerShoot();
+            }
+        }, { passive: true });
+
+        /* -------------------------------------------------- */
+        /* 5. MEDIAPIPE HANDS SETUP & GESTURE RECOGNITION     */
+        /* -------------------------------------------------- */
+        function initMediaPipeHands() {
+            if (handsInstance) return;
+
+            handsInstance = new Hands({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+            });
+
+            handsInstance.setOptions({
+                maxNumHands: 1,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.6,
+                minTrackingConfidence: 0.6
+            });
+
+            handsInstance.onResults(onHandResults);
+
+            cameraInstance = new Camera(webcamVideo, {
+                onFrame: async () => {
+                    if (controlMode === 'webcam' && gameRunning) {
+                        await handsInstance.send({ image: webcamVideo });
+                    }
+                },
+                width: 640,
+                height: 480
+            });
+        }
+
+        function onHandResults(results) {
+            if (!gameRunning || controlMode !== 'webcam') return;
+
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                handLandmarksData = results.multiHandLandmarks[0];
+
+                // Landmark 8: Index Finger Tip
+                const indexTip = handLandmarksData[8];
+                // Mirror X for intuitive webcam tracking
+                reticle.x = (1 - indexTip.x) * canvas.width;
+                reticle.y = indexTip.y * canvas.height;
+                reticle.active = true;
+
+                // Gesture Detection:
+                // 1. Pinch: Distance between Landmark 4 (Thumb Tip) & Landmark 8 (Index Tip)
+                const thumbTip = handLandmarksData[4];
+                const wrist = handLandmarksData[0];
+                const middleMCP = handLandmarksData[9];
+
+                // Hand scale reference (wrist to middle MCP)
+                const handScale = Math.hypot(middleMCP.x - wrist.x, middleMCP.y - wrist.y);
+                const pinchDist = Math.hypot(thumbTip.x - indexTip.x, thumbTip.y - indexTip.y);
+
+                const prevPinch = isPinching;
+                isPinching = (pinchDist / handScale) < 0.35;
+
+                // 2. Fist: Average distance from fingertips (8, 12, 16, 20) to wrist (0)
+                const tips = [8, 12, 16, 20];
+                let avgTipDist = 0;
+                tips.forEach(t => {
+                    avgTipDist += Math.hypot(handLandmarksData[t].x - wrist.x, handLandmarksData[t].y - wrist.y);
+                });
+                avgTipDist /= 4;
+                isFisting = (avgTipDist / handScale) < 0.85;
+
+                // Update UI Indicator Badge
+                const dot = document.getElementById('gesture-indicator-dot');
+                const txt = document.getElementById('gesture-text');
+                if (isPinching) {
+                    dot.className = "w-3.5 h-3.5 rounded-full bg-cyan-400 animate-ping";
+                    txt.textContent = "ISYARAT: PINCH!";
+                    txt.className = "text-xs font-bold text-cyan-400 uppercase tracking-wider font-arcade";
+                } else if (isFisting) {
+                    dot.className = "w-3.5 h-3.5 rounded-full bg-pink-500 animate-pulse";
+                    txt.textContent = "ISYARAT: GENGGAM!";
+                    txt.className = "text-xs font-bold text-pink-400 uppercase tracking-wider font-arcade";
+                } else {
+                    dot.className = "w-3.5 h-3.5 rounded-full bg-emerald-400";
+                    txt.textContent = "MENJEJAK JARI TELUNJUK";
+                    txt.className = "text-xs font-bold text-emerald-300 uppercase tracking-wider font-arcade";
+                }
+
+                // Trigger shot on newly detected pinch or fist
+                const now = Date.now();
+                if ((isPinching && !prevPinch) || (isFisting && now - lastTriggerTime > 350)) {
+                    lastTriggerTime = now;
+                    triggerShoot();
+                }
+            } else {
+                handLandmarksData = null;
+                reticle.active = false;
+                document.getElementById('gesture-indicator-dot').className = "w-3.5 h-3.5 rounded-full bg-slate-500";
+                document.getElementById('gesture-text').textContent = "CARI TANGAN...";
+            }
+        }
+
+        /* -------------------------------------------------- */
+        /* 6. BALLOON & TARGET LOGIC                          */
+        /* -------------------------------------------------- */
+        class Balloon {
+            constructor(text, isCorrect, index) {
+                this.text = text;
+                this.isCorrect = isCorrect;
+                this.radius = Math.max(38, Math.min(canvas.width / 12, 52));
+                
+                // Distribute horizontally
+                const slotWidth = canvas.width / 4;
+                this.x = slotWidth * index + slotWidth / 2 + (Math.random() * 20 - 10);
+                this.y = canvas.height + this.radius + 20 + (Math.random() * 40);
+                
+                this.speedY = 1.6 + Math.random() * 1.2;
+                this.swayAmp = 15 + Math.random() * 20;
+                this.swayFreq = 0.02 + Math.random() * 0.02;
+                this.baseX = this.x;
+                this.angle = Math.random() * Math.PI * 2;
+                
+                // Colors (Cyan, Pink, Yellow, Purple neon themes)
+                const palette = [
+                    { main: '#06b6d4', glow: 'rgba(6,182,212,0.8)' },
+                    { main: '#ec4899', glow: 'rgba(236,72,153,0.8)' },
+                    { main: '#eab308', glow: 'rgba(234,179,8,0.8)' },
+                    { main: '#a855f7', glow: 'rgba(168,85,247,0.8)' }
+                ];
+                this.color = palette[index % palette.length];
+                this.popped = false;
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.angle += this.swayFreq;
+                this.x = this.baseX + Math.sin(this.angle) * this.swayAmp;
+
+                // Respawn at bottom if floated off top
+                if (this.y < -this.radius * 2) {
+                    this.y = canvas.height + this.radius + 20;
+                    this.baseX = Math.random() * (canvas.width - 100) + 50;
+                }
+            }
+
+            draw(ctx) {
+                ctx.save();
+
+                // Draw Balloon Ribbon
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y + this.radius);
+                ctx.quadraticCurveTo(this.x + Math.sin(this.angle * 2) * 10, this.y + this.radius + 25, this.x, this.y + this.radius + 45);
+                ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Balloon Glow Shadow
+                ctx.shadowColor = this.color.glow;
+                ctx.shadowBlur = 15;
+
+                // Balloon Body Gradient
+                const grad = ctx.createRadialGradient(
+                    this.x - this.radius * 0.3, this.y - this.radius * 0.3, this.radius * 0.1,
+                    this.x, this.y, this.radius
+                );
+                grad.addColorStop(0, '#ffffff');
+                grad.addColorStop(0.3, this.color.main);
+                grad.addColorStop(1, '#0f172a');
+
+                ctx.beginPath();
+                ctx.ellipse(this.x, this.y, this.radius, this.radius * 1.15, 0, 0, Math.PI * 2);
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                // Balloon Knot
+                ctx.beginPath();
+                ctx.moveTo(this.x - 6, this.y + this.radius * 1.12);
+                ctx.lineTo(this.x + 6, this.y + this.radius * 1.12);
+                ctx.lineTo(this.x, this.y + this.radius * 1.12 + 6);
+                ctx.closePath();
+                ctx.fillStyle = this.color.main;
+                ctx.fill();
+
+                // Reset Shadow for Text Card
+                ctx.shadowBlur = 0;
+
+                // Answer Badge Below/Inside Balloon
+                ctx.font = 'bold 13px "Plus Jakarta Sans", sans-serif';
+                const textWidth = ctx.measureText(this.text).width;
+                const badgeW = Math.max(textWidth + 20, 80);
+                const badgeH = 26;
+                const badgeX = this.x - badgeW / 2;
+                const badgeY = this.y - badgeH / 2;
+
+                // Badge Container
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+                ctx.strokeStyle = this.color.main;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 13);
+                ctx.fill();
+                ctx.stroke();
+
+                // Badge Text
+                ctx.fillStyle = '#ffffff';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.text, this.x, this.y);
+
+                ctx.restore();
+            }
+        }
+
+        /* Particles Explosion VFX */
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 5 + 2;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 8 + 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.03 + 0.02;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.15; // Gravity
+                this.alpha -= this.decay;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.alpha);
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 10;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        /* Floating Score Text Popups */
+        class FloatingText {
+            constructor(x, y, text, color) {
+                this.x = x;
+                this.y = y;
+                this.text = text;
+                this.color = color;
+                this.alpha = 1;
+                this.vy = -2;
+            }
+
+            update() {
+                this.y += this.vy;
+                this.alpha -= 0.025;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.alpha);
+                ctx.font = '900 20px "Orbitron", sans-serif';
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 12;
+                ctx.textAlign = 'center';
+                ctx.fillText(this.text, this.x, this.y);
+                ctx.restore();
+            }
+        }
+
+        /* Create Explosions */
+        function createExplosion(x, y, colorHex) {
+            for (let i = 0; i < 25; i++) {
+                particles.push(new Particle(x, y, colorHex));
+            }
+        }
+
+        /* -------------------------------------------------- */
+        /* 7. GAMEPLAY LOGIC & FLOW                           */
+        /* -------------------------------------------------- */
+        function startGame() {
+            audioManager.init();
+            audioManager.startBgm();
+
+            // Reset States
+            score = 0;
+            combo = 1;
+            maxCombo = 1;
+            timeLeft = 60;
+            currentQuestionIndex = 0;
+            userLogs = [];
+            particles = [];
+            floatingTexts = [];
+
+            // Shuffle Questions
+            questionsList = [...QUESTION_BANK].sort(() => Math.random() - 0.5);
+
+            // Update UI
+            document.getElementById('screen-menu').classList.add('hidden');
+            document.getElementById('screen-results').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+
+            resizeCanvas();
+            loadQuestion(currentQuestionIndex);
+
+            // Start Timer
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!gameRunning) return;
+                timeLeft--;
+                document.getElementById('ui-timer').textContent = `${timeLeft}s`;
+
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
+            // Webcam Initialization if selected
+            if (controlMode === 'webcam') {
+                initMediaPipeHands();
+                if (cameraInstance) {
+                    cameraInstance.start().catch(err => {
+                        console.warn("Webcam blocked/failed, switching to mouse mode.", err);
+                        setControlMode('mouse');
+                    });
+                }
+            }
+
+            gameRunning = true;
+            requestAnimationFrame(gameLoop);
+        }
+
+        function loadQuestion(index) {
+            if (index >= questionsList.length) {
+                // Loop questions if reached end before 60s
+                currentQuestionIndex = 0;
+                questionsList.sort(() => Math.random() - 0.5);
+            }
+
+            const qData = questionsList[currentQuestionIndex];
+            document.getElementById('ui-q-num').textContent = `SOALAN ${currentQuestionIndex + 1} / ${questionsList.length}`;
+            document.getElementById('ui-question').textContent = qData.question;
+
+            // Spawn Balloons for options
+            balloons = [];
+            const shuffledOptions = [...qData.options].sort(() => Math.random() - 0.5);
+            shuffledOptions.forEach((optText, i) => {
+                const isCorrect = (optText === qData.answer);
+                balloons.push(new Balloon(optText, isCorrect, i));
+            });
+        }
+
+        function triggerShoot() {
+            if (!gameRunning || balloons.length === 0) return;
+
+            let hit = false;
+            const currentQ = questionsList[currentQuestionIndex];
+
+            for (let i = balloons.length - 1; i >= 0; i--) {
+                const b = balloons[i];
+                const dist = Math.hypot(reticle.x - b.x, reticle.y - b.y);
+
+                if (dist < b.radius + 15) {
+                    hit = true;
+                    b.popped = true;
+                    createExplosion(b.x, b.y, b.color.main);
+                    audioManager.playPop();
+
+                    // Log response
+                    userLogs.push({
+                        question: currentQ.question,
+                        userAnswer: b.text,
+                        correctAnswer: currentQ.answer,
+                        isCorrect: b.isCorrect,
+                        explanation: currentQ.explanation
+                    });
+
+                    if (b.isCorrect) {
+                        // Correct Answer Hit!
+                        const addedScore = 100 * combo;
+                        score += addedScore;
+                        combo++;
+                        if (combo > maxCombo) maxCombo = combo;
+
+                        audioManager.playCorrect();
+                        if (combo > 2) audioManager.playCombo();
+
+                        floatingTexts.push(new FloatingText(b.x, b.y, `+${addedScore} PTS!`, '#eab308'));
+                        if (combo > 1) {
+                            floatingTexts.push(new FloatingText(b.x, b.y - 30, `KOMBO x${combo}!`, '#ec4899'));
+                        }
+
+                        // Update HUD & Advance Question
+                        document.getElementById('ui-score').textContent = score;
+                        document.getElementById('ui-combo').textContent = `x${combo}`;
+                        
+                        setTimeout(() => {
+                            currentQuestionIndex++;
+                            loadQuestion(currentQuestionIndex);
+                        }, 300);
+
+                    } else {
+                        // Wrong Answer Hit
+                        combo = 1;
+                        audioManager.playWrong();
+                        floatingTexts.push(new FloatingText(b.x, b.y, `SALAH!`, '#ef4444'));
+
+                        document.getElementById('ui-combo').textContent = `x${combo}`;
+
+                        setTimeout(() => {
+                            currentQuestionIndex++;
+                            loadQuestion(currentQuestionIndex);
+                        }, 300);
+                    }
+                    break;
+                }
+            }
+
+            if (!hit) {
+                // Shot missed balloons
+                audioManager.playPop();
+            }
+        }
+
+        function endGame() {
+            gameRunning = false;
+            if (timerInterval) clearInterval(timerInterval);
+            audioManager.stopBgm();
+
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-results').classList.remove('hidden');
+
+            // Compute Statistics
+            const totalAnswered = userLogs.length;
+            const correctCount = userLogs.filter(l => l.isCorrect).length;
+            const accuracy = totalAnswered > 0 ? Math.round((correctCount / totalAnswered) * 100) : 0;
+
+            // Grade Calculation
+            let grade = 'C';
+            if (accuracy >= 90 && score >= 1200) grade = 'S (Cemerlang)';
+            else if (accuracy >= 80) grade = 'A+';
+            else if (accuracy >= 70) grade = 'A';
+            else if (accuracy >= 50) grade = 'B';
+
+            // Populate Results HUD
+            document.getElementById('res-score').textContent = score;
+            document.getElementById('res-accuracy').textContent = `${accuracy}%`;
+            document.getElementById('res-combo').textContent = `x${maxCombo}`;
+            document.getElementById('res-grade').textContent = grade;
+
+            // Render Analysis Table / List
+            const listContainer = document.getElementById('analysis-list');
+            listContainer.innerHTML = '';
+
+            if (userLogs.length === 0) {
+                listContainer.innerHTML = `<div class="text-center text-slate-400 py-8">Tiada jawapan direkodkan. Sila cuba lagi!</div>`;
+                return;
+            }
+
+            userLogs.forEach((log, idx) => {
+                const card = document.createElement('div');
+                card.className = `p-3.5 rounded-xl border ${log.isCorrect ? 'bg-emerald-950/40 border-emerald-500/40' : 'bg-rose-950/40 border-rose-500/40'} backdrop-blur-md`;
+
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="font-bold text-xs md:text-sm text-slate-200">
+                            <span class="text-cyan-400 font-arcade">#${idx + 1}</span> ${log.question}
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${log.isCorrect ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'}">
+                            ${log.isCorrect ? '<i class="fa-solid fa-check mr-1"></i> BETUL' : '<i class="fa-solid fa-xmark mr-1"></i> SALAH'}
+                        </span>
+                    </div>
+                    <div class="mt-2 text-xs grid grid-cols-1 md:grid-cols-2 gap-1.5">
+                        <div class="text-slate-300">Jawapan Anda: <span class="${log.isCorrect ? 'text-emerald-300 font-bold' : 'text-rose-300 font-bold'}">${log.userAnswer}</span></div>
+                        <div class="text-slate-300">Jawapan Tepat: <span class="text-cyan-300 font-bold">${log.correctAnswer}</span></div>
+                    </div>
+                    <div class="mt-2 text-[11px] text-purple-200 bg-slate-900/80 p-2 rounded-lg border border-purple-500/20">
+                        <i class="fa-solid fa-book-open text-cyan-400 mr-1.5"></i> <strong>Nota Tatabahasa:</strong> ${log.explanation}
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        function showMenu() {
+            gameRunning = false;
+            if (timerInterval) clearInterval(timerInterval);
+            audioManager.stopBgm();
+
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-results').classList.add('hidden');
+            document.getElementById('screen-menu').classList.remove('hidden');
+        }
+
+        /* -------------------------------------------------- */
+        /* 8. MAIN CANVAS ANIMATION RENDER LOOP (60 FPS)      */
+        /* -------------------------------------------------- */
+        function gameLoop() {
+            if (!gameRunning) return;
+
+            // Clear Background
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Subtle Neon Grid Background
+            ctx.save();
+            ctx.strokeStyle = 'rgba(168, 85, 247, 0.06)';
+            ctx.lineWidth = 1;
+            const gridSize = 40;
+            for (let x = 0; x < canvas.width; x += gridSize) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+            ctx.restore();
+
+            // Draw MediaPipe Hand Skeleton Overlay (If webcam active)
+            if (controlMode === 'webcam' && handLandmarksData) {
+                ctx.save();
+                ctx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
+                ctx.lineWidth = 3;
+
+                // Draw Connections
+                const connections = [
+                    [0,1],[1,2],[2,3],[3,4], // Thumb
+                    [0,5],[5,6],[6,7],[7,8], // Index
+                    [5,9],[9,10],[10,11],[11,12], // Middle
+                    [9,13],[13,14],[14,15],[15,16], // Ring
+                    [13,17],[17,18],[18,19],[19,20],[0,17] // Pinky
+                ];
+
+                connections.forEach(([i, j]) => {
+                    const p1 = handLandmarksData[i];
+                    const p2 = handLandmarksData[j];
+                    ctx.beginPath();
+                    ctx.moveTo((1 - p1.x) * canvas.width, p1.y * canvas.height);
+                    ctx.lineTo((1 - p2.x) * canvas.width, p2.y * canvas.height);
+                    ctx.stroke();
+                });
+
+                // Draw Landmark Dots
+                handLandmarksData.forEach((lm, idx) => {
+                    ctx.beginPath();
+                    ctx.arc((1 - lm.x) * canvas.width, lm.y * canvas.height, idx === 8 ? 6 : 3, 0, Math.PI * 2);
+                    ctx.fillStyle = (idx === 8 || idx === 4) ? '#ec4899' : '#06b6d4';
+                    ctx.fill();
+                });
+
+                ctx.restore();
+            }
+
+            // Update & Render Balloons
+            balloons.forEach(b => {
+                b.update();
+                b.draw(ctx);
+            });
+
+            // Update & Render Particles VFX
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw(ctx);
+                if (p.alpha <= 0) particles.splice(i, 1);
+            }
+
+            // Update & Render Floating Score Text
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                const ft = floatingTexts[i];
+                ft.update();
+                ft.draw(ctx);
+                if (ft.alpha <= 0) floatingTexts.splice(i, 1);
+            }
+
+            // Hover Dwell Logic & Target Reticle Rendering
+            if (reticle.active) {
+                ctx.save();
+
+                // Check balloon hovering for Hover-Dwell auto-pop (0.6s)
+                let hoveredBalloon = false;
+                balloons.forEach(b => {
+                    const dist = Math.hypot(reticle.x - b.x, reticle.y - b.y);
+                    if (dist < b.radius + 15) {
+                        hoveredBalloon = true;
+                    }
+                });
+
+                if (hoveredBalloon) {
+                    reticle.dwellTime += 1 / 60; // 60 FPS frame time
+                    if (reticle.dwellTime >= 0.6) {
+                        reticle.dwellTime = 0;
+                        triggerShoot();
+                    }
+                } else {
+                    reticle.dwellTime = Math.max(0, reticle.dwellTime - 2 / 60);
+                }
+
+                // Render Reticle Cursor
+                ctx.shadowColor = isPinching ? '#06b6d4' : (isFisting ? '#ec4899' : '#eab308');
+                ctx.shadowBlur = 15;
+
+                // Outer Reticle Circle
+                ctx.beginPath();
+                ctx.arc(reticle.x, reticle.y, reticle.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = isPinching ? '#06b6d4' : (isFisting ? '#ec4899' : '#eab308');
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Dwell Progress Radial Ring
+                if (reticle.dwellTime > 0) {
+                    ctx.beginPath();
+                    ctx.arc(reticle.x, reticle.y, reticle.radius + 6, -Math.PI / 2, -Math.PI / 2 + (reticle.dwellTime / 0.6) * Math.PI * 2);
+                    ctx.strokeStyle = '#38bdf8';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                }
+
+                // Crosshair Center Dots
+                ctx.beginPath();
+                ctx.arc(reticle.x, reticle.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+
+                // Crosshair Lines
+                ctx.beginPath();
+                ctx.moveTo(reticle.x - 12, reticle.y); ctx.lineTo(reticle.x - 5, reticle.y);
+                ctx.moveTo(reticle.x + 5, reticle.y); ctx.lineTo(reticle.x + 12, reticle.y);
+                ctx.moveTo(reticle.x, reticle.y - 12); ctx.lineTo(reticle.x, reticle.y - 5);
+                ctx.moveTo(reticle.x, reticle.y + 5); ctx.lineTo(reticle.x, reticle.y + 12);
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.restore();
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Initialize Canvas Size on Window Load
+        window.onload = () => {
+            resizeCanvas();
+        };
+    </script>
+</body>
+</html>
